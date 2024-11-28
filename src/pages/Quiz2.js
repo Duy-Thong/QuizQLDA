@@ -27,22 +27,24 @@ const Quiz2 = () => {
   }, [location.state, navigate]);
 
   useEffect(() => {
-    if (showAnswer && timer === null) {
-      setTimer(5);
-      const interval = setInterval(() => {
-        setTimer((prevTimer) => {
-          if (prevTimer <= 1) {
-            clearInterval(interval);
+    let timer;
+    if (showAnswer) {
+      setTimer(10);
+      timer = setInterval(() => {
+        setTimer((prevTime) => {
+          if (prevTime <= 1) {
+            clearInterval(timer);
             handleNext();
             return null;
           }
-          return prevTimer - 1;
+          return prevTime - 1;
         });
       }, 1000);
-
-      return () => clearInterval(interval);
     }
-  }, [showAnswer]);
+    return () => {
+      clearInterval(timer);
+    };
+  }, [showAnswer, handleNext]);
 
   const handleAnswerChange = (e) => {
     if (showAnswer) return;

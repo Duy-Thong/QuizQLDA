@@ -92,7 +92,7 @@ function QuizPMP() {
   useEffect(() => {
     let timer;
     if (showAnswer) {
-      setCountdown(5);
+      setCountdown(10); // Changed from 5 to 10
       timer = setInterval(() => {
         setCountdown((prevCount) => {
           if (prevCount <= 1) {

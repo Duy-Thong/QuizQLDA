@@ -58,6 +58,26 @@ function Quiz() {
     }
   }, [showAnswer]);
 
+  useEffect(() => {
+    let timer;
+    if (showAnswer) {
+      setTimer(10);
+      timer = setInterval(() => {
+        setTimer((prevTime) => {
+          if (prevTime <= 1) {
+            clearInterval(timer);
+            handleNext();
+            return null;
+          }
+          return prevTime - 1;
+        });
+      }, 1000);
+    }
+    return () => {
+      clearInterval(timer);
+    };
+  }, [showAnswer, handleNext]);
+
   const handleAnswerClick = (answerIndex) => {
     if (showAnswer) return; // Prevent selecting another answer while showing feedback
     
