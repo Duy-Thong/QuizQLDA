@@ -18,6 +18,7 @@ function QuizPMP() {
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [canNavigate, setCanNavigate] = useState(false);
   const [countdown, setCountdown] = useState(null);
+  const [isViewingPrevious, setIsViewingPrevious] = useState(false);
   const { selectedChapters } = location.state || {};
 
   useEffect(() => {
@@ -73,6 +74,7 @@ function QuizPMP() {
   const handleNext = useCallback(() => {
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
+      setIsViewingPrevious(false);  // Reset flag when moving forward
       // Kiểm tra xem câu tiếp theo đã được trả lời chưa
       const nextAnswer = userAnswers.find(a => a.questionIndex === currentQuestion + 1);
       if (nextAnswer) {
@@ -91,8 +93,8 @@ function QuizPMP() {
 
   useEffect(() => {
     let timer;
-    if (showAnswer) {
-      setCountdown(10); // Changed from 5 to 10
+    if (showAnswer && !isViewingPrevious) {  // Only countdown if not viewing previous
+      setCountdown(30); // Changed from 5 to 10
       timer = setInterval(() => {
         setCountdown((prevCount) => {
           if (prevCount <= 1) {
@@ -107,7 +109,7 @@ function QuizPMP() {
     return () => {
       clearInterval(timer);
     };
-  }, [showAnswer, handleNext]);
+  }, [showAnswer, handleNext, isViewingPrevious]);
 
   const handleAnswerClick = (answerIndex) => {
     if (showAnswer) return;
@@ -134,6 +136,7 @@ function QuizPMP() {
   const handlePrevious = () => {
     if (currentQuestion > 0) {
       setCurrentQuestion(currentQuestion - 1);
+      setIsViewingPrevious(true);  // Set flag when viewing previous
       // Lấy câu trả lời trước đó
       const prevAnswer = userAnswers.find(a => a.questionIndex === currentQuestion - 1);
       if (prevAnswer) {
