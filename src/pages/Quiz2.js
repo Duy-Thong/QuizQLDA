@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, Button, Space, Progress, Typography, Modal, Radio } from 'antd';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { StopOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
@@ -19,6 +19,31 @@ const Quiz2 = () => {
   const [canNavigate, setCanNavigate] = useState(false);
   const [timer, setTimer] = useState(null);
 
+  const handleNext = useCallback(() => {
+    const nextQuestion = currentQuestion + 1;
+    if (nextQuestion < questions.length) {
+      setCurrentQuestion(nextQuestion);
+      const nextQuestionAnswer = userAnswers.find(a => a.questionIndex === nextQuestion);
+      if (nextQuestionAnswer) {
+        setShowAnswer(true);
+        setSelectedAnswer(nextQuestionAnswer.userAnswer);
+      } else {
+        setShowAnswer(false);
+        setSelectedAnswer(null);
+        setCanNavigate(false);
+      }
+    } else {
+      navigate('/result2', { 
+        state: { 
+          score, 
+          total: questions.length,
+          questions,
+          userAnswers
+        } 
+      });
+    }
+  }, [currentQuestion, questions, score, userAnswers, navigate]);
+
   useEffect(() => {
     if (!location.state?.questions) {
       navigate('/');
@@ -28,8 +53,10 @@ const Quiz2 = () => {
 
   useEffect(() => {
     let timer;
-    if (showAnswer) {
-      setTimer(10);
+    const isReviewingAnswer = userAnswers.some(a => a.questionIndex === currentQuestion);
+    
+    if (showAnswer && !isReviewingAnswer) {
+      setTimer(30);
       timer = setInterval(() => {
         setTimer((prevTime) => {
           if (prevTime <= 1) {
@@ -44,7 +71,7 @@ const Quiz2 = () => {
     return () => {
       clearInterval(timer);
     };
-  }, [showAnswer, handleNext]);
+  }, [showAnswer, handleNext, currentQuestion, userAnswers]);
 
   const handleAnswerChange = (e) => {
     if (showAnswer) return;
@@ -75,31 +102,6 @@ const Quiz2 = () => {
         userAnswer: answerKey,
         isCorrect
       }]);
-    }
-  };
-
-  const handleNext = () => {
-    const nextQuestion = currentQuestion + 1;
-    if (nextQuestion < questions.length) {
-      setCurrentQuestion(nextQuestion);
-      const nextQuestionAnswer = userAnswers.find(a => a.questionIndex === nextQuestion);
-      if (nextQuestionAnswer) {
-        setShowAnswer(true);
-        setSelectedAnswer(nextQuestionAnswer.userAnswer);
-      } else {
-        setShowAnswer(false);
-        setSelectedAnswer(null);
-        setCanNavigate(false);
-      }
-    } else {
-      navigate('/result2', { 
-        state: { 
-          score, 
-          total: questions.length,
-          questions,
-          userAnswers
-        } 
-      });
     }
   };
 
