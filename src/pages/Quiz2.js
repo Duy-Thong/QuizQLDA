@@ -134,6 +134,16 @@ const Quiz2 = () => {
     return userAnswers.length;
   };
 
+  const getOptionsEntries = (questionData) => {
+    if (Array.isArray(questionData.options)) {
+      return questionData.options.map((option, index) => {
+        const key = String.fromCharCode(65 + index); // Convert 0 to A, 1 to B, etc.
+        return [key, option];
+      });
+    }
+    return Object.entries(questionData.options);
+  };
+
   if (!questions?.length) return <div>Loading...</div>;
 
   const currentQuestionData = questions[currentQuestion];
@@ -176,7 +186,7 @@ const Quiz2 = () => {
             value={selectedAnswer}
             className="space-y-3 w-full"
           >
-            {Object.entries(currentQuestionData.options).map(([key, value]) => (
+            {getOptionsEntries(currentQuestionData).map(([key, value]) => (
               <Button 
                 key={key}
                 block
@@ -190,7 +200,9 @@ const Quiz2 = () => {
               >
                 <Radio value={key} style={{ display: 'none' }} />
                 <div className="flex">
-                  <div className="flex-grow text-sm sm:text-base">{`${key}. ${value}`}</div>
+                  <div className="flex-grow text-sm sm:text-base">
+                    {Array.isArray(currentQuestionData.options) ? value : `${key}. ${value}`}
+                  </div>
                   {showAnswer && key === currentQuestionData.answer && (
                     <CheckCircleOutlined className="text-green-500 ml-2 flex-shrink-0" />
                   )}

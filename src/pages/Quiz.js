@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Card, Button, Space, Progress, Typography, Modal } from 'antd';
 import { StopOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
@@ -19,6 +19,7 @@ function Quiz() {
   const [canNavigate, setCanNavigate] = useState(false);
   const [timer, setTimer] = useState(null);
   const [sequentialNumbers, setSequentialNumbers] = useState({});
+  const [isViewingPrevious, setIsViewingPrevious] = useState(false);
   const selectedPackages = location.state?.packages || [];
 
   // Thêm hàm tính số thứ tự câu hỏi
@@ -31,6 +32,34 @@ function Quiz() {
     return ((question.packageId - 1) * 50) + question.orderNumber;
   };
 
+  const handleNext = useCallback(() => {
+    setIsViewingPrevious(false); // Reset viewing previous when moving to next question
+    const nextQuestion = currentQuestion + 1;
+    if (nextQuestion < questions.length) {
+      setCurrentQuestion(nextQuestion);
+      const nextQuestionIndex = questions[nextQuestion].index;
+      const nextQuestionAnswer = userAnswers.find(a => a.questionIndex === nextQuestionIndex);
+      if (nextQuestionAnswer) {
+        setShowAnswer(true);
+        setSelectedAnswer(nextQuestionAnswer.userAnswer);
+      } else {
+        setShowAnswer(false);
+        setSelectedAnswer(null);
+        setCanNavigate(false);
+      }
+    } else {
+      navigate('/result', { 
+        state: { 
+          score, 
+          total: questions.length,
+          packages: selectedPackages,
+          questions,
+          userAnswers
+        } 
+      });
+    }
+  }, [currentQuestion, questions, userAnswers, score, selectedPackages, navigate]);
+
   useEffect(() => {
     if (!location.state?.questions) {
       navigate('/'); // Redirect if no questions data
@@ -39,29 +68,14 @@ function Quiz() {
     setQuestions(location.state.questions);
   }, [location.state, navigate]);
 
-  // Add new useEffect for auto-navigation
-  useEffect(() => {
-    if (showAnswer && timer === null) {
-      setTimer(5);
-      const interval = setInterval(() => {
-        setTimer((prevTimer) => {
-          if (prevTimer <= 1) {
-            clearInterval(interval);
-            handleNext();
-            return null;
-          }
-          return prevTimer - 1;
-        });
-      }, 1000);
-
-      return () => clearInterval(interval);
-    }
-  }, [showAnswer]);
-
   useEffect(() => {
     let timer;
-    if (showAnswer) {
-      setTimer(10);
+    // Kiểm tra xem câu hỏi hiện tại đã được trả lời chưa
+    const currentQuestionIndex = questions[currentQuestion]?.index;
+    const isAnswered = userAnswers.some(a => a.questionIndex === currentQuestionIndex);
+
+    if (showAnswer && !isViewingPrevious && !isAnswered) { // Chỉ đếm thời gian cho câu hỏi chưa được trả lời
+      setTimer(30);
       timer = setInterval(() => {
         setTimer((prevTime) => {
           if (prevTime <= 1) {
@@ -72,15 +86,17 @@ function Quiz() {
           return prevTime - 1;
         });
       }, 1000);
+    } else {
+      setTimer(null); // Reset timer nếu câu hỏi đã được trả lời
     }
     return () => {
       clearInterval(timer);
     };
-  }, [showAnswer, handleNext]);
+  }, [showAnswer, handleNext, isViewingPrevious, currentQuestion, questions, userAnswers]);
 
   const handleAnswerClick = (answerIndex) => {
     if (showAnswer) return; // Prevent selecting another answer while showing feedback
-    
+    setIsViewingPrevious(false); // Reset viewing previous when answering new question
     const isCorrect = answerIndex === questions[currentQuestion].correct;
     setSelectedAnswer(answerIndex);
     setShowAnswer(true);
@@ -110,44 +126,19 @@ function Quiz() {
     }
   };
 
-  const handleNext = () => {
-    const nextQuestion = currentQuestion + 1;
-    if (nextQuestion < questions.length) {
-      setCurrentQuestion(nextQuestion);
-      // Sửa: Sử dụng index từ data để tìm câu trả lời
-      const nextQuestionIndex = questions[nextQuestion].index;
-      const nextQuestionAnswer = userAnswers.find(a => a.questionIndex === nextQuestionIndex);
-      if (nextQuestionAnswer) {
-        setShowAnswer(true);
-        setSelectedAnswer(nextQuestionAnswer.userAnswer);
-      } else {
-        setShowAnswer(false);
-        setSelectedAnswer(null);
-        setCanNavigate(false);
-      }
-    } else {
-      navigate('/result', { 
-        state: { 
-          score, 
-          total: questions.length,
-          packages: selectedPackages,
-          questions, // Gửi tất cả câu hỏi
-          userAnswers
-        } 
-      });
-    }
-  };
-
   const handlePrevious = () => {
     const prevQuestion = currentQuestion - 1;
     if (prevQuestion >= 0) {
       setCurrentQuestion(prevQuestion);
+      setIsViewingPrevious(true); // Set viewing previous to true
       // Sửa: Sử dụng index từ data để tìm câu trả lời
       const prevQuestionIndex = questions[prevQuestion].index;
       const prevQuestionAnswer = userAnswers.find(a => a.questionIndex === prevQuestionIndex);
       if (prevQuestionAnswer) {
         setShowAnswer(true);
         setSelectedAnswer(prevQuestionAnswer.userAnswer);
+        setTimer(null); // Reset timer when viewing previous
+        setCanNavigate(true); // Thêm dòng này để enable nút Next
       }
     }
   };
@@ -270,7 +261,7 @@ function Quiz() {
             <Button 
               type="primary"
               onClick={handleNext}
-              disabled={!canNavigate && !userAnswers.find(a => a.questionIndex === currentQuestion)}
+              disabled={!showAnswer} // Chỉ disable khi chưa hiện đáp án
             >
               {currentQuestion === questions.length - 1 ? 'Hoàn thành' : 'Câu tiếp'}
             </Button>
