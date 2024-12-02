@@ -20,6 +20,8 @@ import ReviewPMP from './pages/ReviewPMP';
 import ViewAllPMP from './pages/ViewAllPMP';
 import MockExamPMP from './pages/MockExamPMP';
 import MockExamResults from './pages/MockExamResults';
+import Test277 from './pages/Test277';
+import ResultTest277 from './pages/ResultTest277';
 import './App.css';
 
 const { Header, Content, Footer } = Layout;
@@ -51,6 +53,8 @@ function App() {
             <Route path="/view-all-pmp" element={<ViewAllPMP />} />
             <Route path="/mock-exam-pmp" element={<MockExamPMP />} />
             <Route path="/mock-exam-results" element={<MockExamResults />} />
+            <Route path="/test277" element={<Test277 />} />
+            <Route path="/resulttest277" element={<ResultTest277 />} />
           </Routes>
         </Content>
         <Footer className="text-center bg-white mt-auto">

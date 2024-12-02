@@ -11,6 +11,7 @@ const Question277 = () => {
   const [selectedSets, setSelectedSets] = useState([]); // Changed from selectedSet to selectedSets
   const [startQuiz, setStartQuiz] = useState(false);
   const [viewMode, setViewMode] = useState('numeric'); // New state for view mode
+  const [mockExamQuestions, setMockExamQuestions] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -99,6 +100,26 @@ const Question277 = () => {
     }
   };
 
+  const handleMockExam = () => {
+    const currentSets = viewMode === 'numeric' ? questionSets : topicSets;
+    if (currentSets.length > 0) {
+      // Get all questions
+      const allQuestions = currentSets.reduce((acc, set) => {
+        return [...acc, ...set.questions];
+      }, []);
+      
+      // Randomly select 30 questions instead of 180
+      const shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
+      const selected = shuffled.slice(0, 30);
+      
+      navigate('/test277', { 
+        state: { 
+          questions: selected
+        }
+      });
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-5 w-full">
       <Card className="shadow-md">
@@ -162,6 +183,18 @@ const Question277 = () => {
               className="h-12 font-bold text-base"
             >
               Xem tất cả câu hỏi
+            </Button>
+          </Col>
+          <Col xs={24} md={12} lg={8}>
+            <Button
+              type="primary"
+              size="large"
+              onClick={handleMockExam}
+              disabled={questionSets.length === 0}
+              block
+              className="h-12 font-bold text-base bg-green-500 hover:bg-green-600"
+            >
+              Thi thử (30 câu - 30 phút)
             </Button>
           </Col>
         </Row>
