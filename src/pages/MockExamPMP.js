@@ -109,14 +109,14 @@ function MockExamPMP() {
   const { question = '', options = {} } = currentQuestion;
 
   return (
-    <div className="min-h-screen">
-      <div className="flex gap-6 max-w-[1800px] mx-auto">
+    <div className="min-h-screen p-4">
+      <div className="flex flex-col lg:flex-row gap-6 max-w-[1800px] mx-auto">
         {/* Left column - Main content */}
-        <div className="flex-[3]">
+        <div className="lg:flex-[3] w-full">
           <Card className="mb-4 shadow-md">
-            <div className="flex justify-between items-center mb-6 border-b pb-4">
+            <div className="flex flex-col sm:flex-row justify-between items-center mb-6 border-b pb-4">
               <Title level={4} className="!mb-0">Câu hỏi {currentQuestionIndex + 1}/30</Title>
-              <div className="text-xl font-bold text-red-500 bg-red-50 px-4 py-2 rounded-lg">
+              <div className="text-xl font-bold text-red-500 bg-red-50 px-4 py-2 rounded-lg mt-2 sm:mt-0">
                 {formatTime(timeRemaining)}
               </div>
             </div>
@@ -142,12 +142,13 @@ function MockExamPMP() {
             )}
           </Card>
 
-          <div className="flex justify-between items-center bg-white p-4 rounded-lg shadow-md">
+          <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-white p-4 rounded-lg shadow-md">
             <Button 
               disabled={currentQuestionIndex === 0}
               onClick={() => moveToQuestion(currentQuestionIndex - 1)}
               icon={<ArrowLeftOutlined />}
               size="large"
+              className="w-full sm:w-auto"
             >
               Câu trước
             </Button>
@@ -157,6 +158,7 @@ function MockExamPMP() {
               danger
               onClick={confirmFinishEarly}
               size="large"
+              className="w-full sm:w-auto"
             >
               Kết thúc bài thi
             </Button>
@@ -165,7 +167,7 @@ function MockExamPMP() {
               <Button 
                 type="primary"
                 onClick={finishExam}
-                className="bg-green-600"
+                className="bg-green-600 w-full sm:w-auto"
                 size="large"
               >
                 Nộp bài
@@ -176,6 +178,7 @@ function MockExamPMP() {
                 onClick={() => moveToQuestion(currentQuestionIndex + 1)}
                 icon={<ArrowRightOutlined />}
                 size="large"
+                className="w-full sm:w-auto"
               >
                 Câu tiếp
               </Button>
@@ -184,13 +187,13 @@ function MockExamPMP() {
         </div>
 
         {/* Right column - Question grid */}
-        <div className="flex-1">
+        <div className="lg:flex-1 w-full">
           <div className="sticky top-6 bg-white rounded-lg shadow-md">
             <div className="border-b p-4">
               <Title level={5} className="!mb-0">Danh sách câu hỏi</Title>
             </div>
             <div className="p-4">
-              <div className="grid grid-cols-5 gap-2">
+              <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
                 {questions.map((_, index) => (
                   <Button
                     key={index}
@@ -198,7 +201,7 @@ function MockExamPMP() {
                     onClick={() => moveToQuestion(index)}
                     className={`
                       ${currentQuestionIndex === index ? "border-2 border-blue-500" : ""} 
-                      h-10 font-medium
+                      h-10 font-medium text-xs sm:text-sm
                       ${answers[index] !== undefined ? "shadow-sm" : ""}
                     `}
                   >

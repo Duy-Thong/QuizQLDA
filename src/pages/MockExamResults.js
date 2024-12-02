@@ -51,8 +51,13 @@ function MockExamResults() {
             {detailedResults.map((result, index) => (
               <Card key={index} className="shadow-sm">
                 <div className="flex flex-col sm:flex-row items-start gap-2">
-                  <div className="font-bold text-sm sm:text-base w-full sm:w-auto">
+                  <div className="font-bold text-sm sm:text-base w-full sm:w-auto flex items-center gap-2">
                     Câu {index + 1}:
+                    {result.userAnswer ? (
+                      <CheckCircleOutlined className="text-blue-500" />
+                    ) : (
+                      <MinusCircleOutlined className="text-gray-500" />
+                    )}
                   </div>
                   <div className="flex-1 w-full">
                     <div className="font-medium mb-3 sm:mb-4 text-sm sm:text-base">{result.question}</div>
