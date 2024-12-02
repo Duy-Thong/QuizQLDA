@@ -36,6 +36,26 @@ function PMP() {
     navigate('/quiz-pmp', { state: { selectedChapters: [chapterId] } });
   };
 
+  const startMockExam = () => {
+    const allQuestions = chapters.reduce((acc, chapter) => {
+      return acc.concat(
+        (chapter.questions || []).map(q => ({
+          ...q,
+          chapterId: chapter.id
+        }))
+      );
+    }, []);
+
+    const shuffled = allQuestions.sort(() => 0.5 - Math.random());
+    const selectedQuestions = shuffled.slice(0, 30);
+
+    navigate('/mock-exam-pmp', { 
+      state: { 
+        questions: selectedQuestions,
+      } 
+    });
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[calc(100vh-64px)]">
@@ -86,7 +106,16 @@ function PMP() {
           ))}
         </div>
 
-        <div className="mt-12 text-center">
+        <div className="mt-12 text-center space-x-4">
+          <Button 
+            type="primary"
+            size="large"
+            onClick={startMockExam}
+            className="min-w-[200px] h-12 text-lg bg-purple-600 hover:bg-purple-700 
+                     transition-colors shadow-md hover:shadow-lg"
+          >
+            Thi thử (30 câu - 30 phút)
+          </Button>
           <Button 
             type="primary"
             size="large"

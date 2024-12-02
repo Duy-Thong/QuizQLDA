@@ -25,60 +25,6 @@ function Home() {
     loadQuestions();
   }, []);
 
-  useEffect(() => {
-    // Initialize chatbot
-    const script = document.createElement('script');
-    script.innerHTML = `
-      window.embeddedChatbotConfig = {
-        chatbotId: "ORx4s2zFxc5v2CE9M0uD-",
-        domain: "www.chatbase.co"
-      }
-    `;
-    document.head.appendChild(script);
-
-    const chatbotScript = document.createElement('script');
-    chatbotScript.src = "https://www.chatbase.co/embed.min.js";
-    chatbotScript.chatbotId = "ORx4s2zFxc5v2CE9M0uD-";
-    chatbotScript.domain = "www.chatbase.co";
-    chatbotScript.defer = true;
-    document.body.appendChild(chatbotScript);
-
-    // Add custom styles for chatbot
-    const style = document.createElement('style');
-    style.textContent = `
-      .chatbase-bubble-iframe {
-        bottom: 20px !important;
-        right: 20px !important;
-        height: 20px !important;
-        width: 20px !important;
-        border-radius: 50% !important;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
-        transition: all 0.3s ease !important;
-      }
-      .chatbase-bubble-iframe:hover {
-        transform: scale(1.05);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15) !important;
-      }
-      .chatbase-container-iframe {
-        bottom: 70px !important;
-        right: 20px !important;
-        height: 400px !important;
-        max-height: 40vh !important;
-        width: 150px !important;
-        border-radius: 10px !important;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1) !important;
-      }
-    `;
-    document.head.appendChild(style);
-
-    // Cleanup function
-    return () => {
-      document.head.removeChild(script);
-      document.head.removeChild(style);
-      document.body.removeChild(chatbotScript);
-    };
-  }, []);
-
   const handleStartQuiz = (path) => {
     navigate(path, { 
       state: { 
@@ -114,7 +60,7 @@ function Home() {
                 {[
                   { title: 'Bài thi 277 câu', path: '/277' },
                   { title: 'Bài thi 1200 câu', path: '/1200' },
-                  { title: 'PMP EXAM PREP', path: '/pmp' }
+                  { title: 'PMP Exam Prep', path: '/pmp' }
                 ].map((quiz, index) => (
                   <Button
                     key={index}
